@@ -167,23 +167,42 @@ if fechas_validas:
     # ==========================================
     st.markdown("<h2 style='text-align: center;'>Fase II: Frontera Eficiente (Modelo Markowitz)</h2>", unsafe_allow_html=True)
     
-    col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
+col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
     with col_o2:
-        modo = st.radio("Estrategia de Estructuración:", ["Asistente de Diversificación Inteligente (7 Sectores)", "Selección Manual de Activos"], horizontal=True)
+        modo = st.radio("Estrategia de Estructuración:", ["Asistente de Diversificación Inteligente", "Selección Manual de Activos"], horizontal=True)
         
         if modo == "Selección Manual de Activos":
             opciones_portafolio = st.multiselect("Defina el universo de activos a optimizar:", nombres_activos, default=["Apple (AAPL) - Tecnología", "Johnson & Johnson (JNJ) - Salud", "Exxon Mobil (XOM) - Energía"])
         else:
-            recomendacion_7_sectores = [
-                "S&P 500 (SPY) - Mercado EE.UU.", 
-                "Apple (AAPL) - Tecnología", 
-                "JPMorgan Chase (JPM) - Finanzas", 
-                "Johnson & Johnson (JNJ) - Salud", 
-                "Walmart (WMT) - Consumo Básico", 
-                "Exxon Mobil (XOM) - Energía", 
-                "Walt Disney (DIS) - Entretenimiento"
-            ]
-            opciones_portafolio = st.multiselect("Portafolio blindado con 7 sectores distintos:", nombres_activos, default=recomendacion_7_sectores)
+            # EL NUEVO ASISTENTE INTELIGENTE PARA LOS 35 ACTIVOS
+            favorita = st.selectbox("Seleccione un activo núcleo (Core Asset):", nombres_activos)
+            
+            # Agrupación interna de los 35 activos para el algoritmo
+            sectores_algoritmo = {
+                "Tecnología": ["Apple (AAPL) - Tecnología", "Microsoft (MSFT) - Tecnología", "Nvidia (NVDA) - Tecnología", "Alphabet (GOOGL) - Tecnología", "Meta Platforms (META) - Tecnología"],
+                "Finanzas": ["JPMorgan Chase (JPM) - Finanzas", "Visa (V) - Finanzas", "Mastercard (MA) - Finanzas", "Bank of America (BAC) - Finanzas", "Goldman Sachs (GS) - Finanzas"],
+                "Salud": ["Johnson & Johnson (JNJ) - Salud", "UnitedHealth (UNH) - Salud", "Eli Lilly (LLY) - Salud", "Pfizer (PFE) - Salud", "AbbVie (ABBV) - Salud"],
+                "Consumo": ["Amazon (AMZN) - Consumo Discrecional", "Tesla (TSLA) - Consumo Discrecional", "Walmart (WMT) - Consumo Básico", "Coca-Cola (KO) - Consumo Básico", "PepsiCo (PEP) - Consumo Básico"],
+                "Energía/Industrial": ["Exxon Mobil (XOM) - Energía", "Chevron (CVX) - Energía", "Caterpillar (CAT) - Industrial", "General Electric (GE) - Industrial", "Lockheed Martin (LMT) - Industrial"],
+                "Telecom/Entretenimiento": ["Walt Disney (DIS) - Entretenimiento", "Netflix (NFLX) - Entretenimiento", "Comcast (CMCSA) - Telecom", "AT&T (T) - Telecom", "Verizon (VZ) - Telecom"],
+                "Refugios/Cripto": ["S&P 500 (SPY) - Mercado EE.UU.", "SPDR Gold (GLD) - ETF Oro", "Bonos del Tesoro (TLT) - Refugio", "Bitcoin (BTC-USD) - Criptomoneda", "Ethereum (ETH-USD) - Criptomoneda"]
+            }
+            
+            recomendacion = [favorita]
+            categoria_fav = None
+            
+            # 1. Identificamos a qué sector pertenece la acción que elegiste
+            for sector, lista_activos in sectores_algoritmo.items():
+                if favorita in lista_activos:
+                    categoria_fav = sector
+                    break
+            
+            # 2. Rellenamos el portafolio con 1 activo líder de cada uno de los OTROS sectores
+            for sector, lista_activos in sectores_algoritmo.items():
+                if sector != categoria_fav:
+                    recomendacion.append(lista_activos[0]) # Toma el primero como representante defensivo
+            
+            opciones_portafolio = st.multiselect("Portafolio blindado sugerido por el algoritmo (7 Sectores):", nombres_activos, default=recomendacion)
         
         opciones_portafolio = list(dict.fromkeys(opciones_portafolio)) # Limpieza automática de duplicados
         st.write("")
