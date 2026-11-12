@@ -29,7 +29,7 @@ st.markdown("""
     }
     .stButton>button:hover { transform: scale(1.01); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5); }
     
-    /* Estilos personalizados para las etiquetas seleccionadas */
+    /* Estilos personalizados para las etiquetas seleccionadas (Tags Azules) */
     span[data-baseweb="tag"] { background-color: rgba(59, 130, 246, 0.25) !important; border: 1px solid #3B82F6 !important; color: #FFFFFF !important; }
     span[data-baseweb="tag"] svg { fill: #FFFFFF !important; }
     
@@ -39,12 +39,12 @@ st.markdown("""
         background-color: rgba(30, 33, 48, 0.85); backdrop-filter: blur(10px); border-left: 5px solid #3B82F6; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
     
-    .hero-banner { background-color: rgba(14, 20, 31, 0.5); backdrop-filter: blur(8px); padding: 80px 40px; border-radius: 15px; text-align: center; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.1); }
-    
     /* Cajas de conclusiones Azules */
     .conclusion-box {
         background-color: rgba(29, 78, 216, 0.15); backdrop-filter: blur(10px); border-left: 5px solid #3B82F6; padding: 25px; border-radius: 8px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
+    
+    .hero-banner { background-color: rgba(14, 20, 31, 0.5); backdrop-filter: blur(8px); padding: 80px 40px; border-radius: 15px; text-align: center; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.1); }
     
     h1, h2, h3, h4 { color: #E2E8F0; font-family: 'Helvetica Neue', sans-serif; }
     </style>
@@ -72,18 +72,21 @@ activos_dict = {
 nombres_activos = list(activos_dict.keys())
 
 # ==========================================
-# 3. BANNER PRINCIPAL
+# 3. BANNER PRINCIPAL (DESCRIPCIÓN INTUITIVA)
 # ==========================================
 st.markdown("""
 <div class="hero-banner">
     <h3 style="color: #FF4B4B; letter-spacing: 3px; text-transform: uppercase; font-weight: 800;">⚡ Financitz</h3>
-    <h1 style="color: #FFFFFF; font-size: 3.2em; font-style: italic; margin-top: 15px; margin-bottom: 20px; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">"El retorno de la inversión es importante,<br>pero también lo es el grado de incertidumbre que lo rodea."</h1>
-    <h3 style="color: #CBD5E1; font-weight: 300;">- Harry Markowitz, Premio Nobel de Economía</h3>
+    <h1 style="color: #FFFFFF; font-size: 2.8em; margin-top: 15px; margin-bottom: 15px; line-height: 1.2;">Motor Estratégico de Inversiones</h1>
+    <h3 style="color: #3B82F6; font-weight: 400; margin-bottom: 20px;">Análisis Cuantitativo y Optimización de Portafolios</h3>
+    <p style="color: #CBD5E1; font-size: 1.15em; max-width: 700px; margin: 0 auto; line-height: 1.5;">
+        Defina su horizonte de inversión para evaluar el mercado y deje que nuestro motor algorítmico construya la estrategia que mejor equilibre su riesgo y rentabilidad.
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 4. SELECCIÓN DE HISTÓRICO DE DATOS (NUEVO TÍTULO)
+# 4. SELECCIÓN DE HISTÓRICO DE DATOS
 # ==========================================
 st.markdown("<h3 style='text-align: center;'>Selección de Histórico de Datos</h3>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #A0AEC0;'>Defina el período de tiempo sobre el cual se calcularán las varianzas, covarianzas y Betas.</p>", unsafe_allow_html=True)
@@ -112,7 +115,6 @@ if fechas_validas:
     
     col_c1, col_c2, col_c3 = st.columns([1, 4, 1])
     with col_c2:
-        # S&P 500 PREDETERMINADO
         activos_comparar = st.multiselect("Seleccione los activos a evaluar:", nombres_activos, default=["S&P 500 (SPY) - Mercado EE.UU.", "Apple (AAPL) - Tecnología"])
         btn_comparar = st.button("Ejecutar Análisis Comparativo")
 
@@ -121,7 +123,7 @@ if fechas_validas:
             tcks_comp = [activos_dict[ac] for ac in activos_comparar]
             with st.spinner("Descargando perfiles corporativos y series de tiempo..."):
                 
-                # Desplegar Información de las Empresas (NUEVO)
+                # Desplegar Información de las Empresas
                 st.markdown("<h4 style='text-align: center; margin-top: 20px; color: #3B82F6;'>Perfil Corporativo de los Activos Seleccionados</h4>", unsafe_allow_html=True)
                 cols_info = st.columns(len(tcks_comp))
                 for idx, ticker in enumerate(tcks_comp):
@@ -135,7 +137,7 @@ if fechas_validas:
                         except:
                             st.markdown(f"**{ticker}**<br>Datos corporativos no disponibles.", unsafe_allow_html=True)
                 
-                # Gráfico
+                # Gráfico Comparativo
                 data_comp = yf.download(tcks_comp, start=fecha_inicio, end=fecha_fin)['Close']
                 fig_comp = go.Figure()
                 if len(tcks_comp) == 1:
@@ -147,7 +149,7 @@ if fechas_validas:
                 for ticker in tcks_comp:
                     fig_comp.add_trace(go.Scatter(x=data_norm.index, y=data_norm[ticker], mode='lines', name=ticker, line=dict(width=3)))
                 
-                fig_comp.update_layout(title="Proyección de Crecimiento (Base $100 USD)", template="plotly_dark", hovermode="x unified", height=450, margin=dict(l=20, r=20, t=50, b=20), paper_bgcolor='rgba(0,0,0,0.5)', plot_bgcolor='rgba(0,0,0,0)')
+                fig_comp.update_layout(title="Proyección de Crecimiento (Base \$100 USD)", template="plotly_dark", hovermode="x unified", height=450, margin=dict(l=20, r=20, t=50, b=20), paper_bgcolor='rgba(0,0,0,0.5)', plot_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_comp, use_container_width=True)
 
                 if len(tcks_comp) > 1:
@@ -161,7 +163,7 @@ if fechas_validas:
     st.divider()
 
     # ==========================================
-    # SECCIÓN 2: OPTIMIZACIÓN Y GRÁFICO DE PUNTOS MARKOWITZ (BETA)
+    # SECCIÓN 2: OPTIMIZACIÓN Y FRONTERA EFICIENTE
     # ==========================================
     st.markdown("<h2 style='text-align: center;'>Fase II: Frontera Eficiente (Modelo Markowitz)</h2>", unsafe_allow_html=True)
     
@@ -172,7 +174,6 @@ if fechas_validas:
         if modo == "Selección Manual de Activos":
             opciones_portafolio = st.multiselect("Defina el universo de activos a optimizar:", nombres_activos, default=["Apple (AAPL) - Tecnología", "Johnson & Johnson (JNJ) - Salud", "Exxon Mobil (XOM) - Energía"])
         else:
-            # PREDETERMINADO DIVERSIFICADO EN 7 SECTORES
             recomendacion_7_sectores = [
                 "S&P 500 (SPY) - Mercado EE.UU.", 
                 "Apple (AAPL) - Tecnología", 
@@ -184,7 +185,7 @@ if fechas_validas:
             ]
             opciones_portafolio = st.multiselect("Portafolio blindado con 7 sectores distintos:", nombres_activos, default=recomendacion_7_sectores)
         
-        opciones_portafolio = list(dict.fromkeys(opciones_portafolio)) # Limpiar duplicados
+        opciones_portafolio = list(dict.fromkeys(opciones_portafolio)) # Limpieza automática de duplicados
         st.write("")
         simular_port_btn = st.button("Construir Frontera Eficiente")
 
@@ -193,13 +194,12 @@ if fechas_validas:
             st.error("El motor de cálculo requiere al menos 2 activos.")
         else:
             tcks_port = [activos_dict[op] for op in opciones_portafolio]
-            # Asegurarnos de tener SPY descargado para calcular el Beta del portafolio
-            tcks_download = list(set(tcks_port + ['SPY']))
+            tcks_download = list(set(tcks_port + ['SPY'])) # Asegurar SPY para el Beta
             
             with st.spinner("Modelando 3,000 portafolios y calculando riesgo Beta..."):
                 data_all = yf.download(tcks_download, start=fecha_inicio, end=fecha_fin)['Close'].pct_change().dropna()
                 retornos = data_all[tcks_port]
-                retornos_mercado = data_all['SPY'] # Para el cálculo de Beta
+                retornos_mercado = data_all['SPY'] 
                 
                 np.random.seed(42)
                 num_port = 3000
@@ -210,7 +210,6 @@ if fechas_validas:
                 matriz_cov = retornos.cov() * 252
                 retornos_anuales = retornos.mean() * 252
                 
-                # Matriz de covarianza de cada activo contra el SPY para los Betas
                 cov_con_mercado = [np.cov(retornos[ticker], retornos_mercado)[0,1] for ticker in tcks_port]
                 var_mercado = np.var(retornos_mercado)
                 betas_individuales = np.array(cov_con_mercado) / var_mercado
@@ -224,82 +223,95 @@ if fechas_validas:
                     vol_port = np.sqrt(np.dot(pesos.T, np.dot(matriz_cov, pesos)))
                     beta_port = np.dot(pesos, betas_individuales)
                     
-                    resultados[0,i] = r_port       # Retorno
-                    resultados[1,i] = vol_port     # Riesgo (Volatilidad)
-                    resultados[2,i] = r_port / vol_port # Ratio de Sharpe
+                    resultados[0,i] = r_port       
+                    resultados[1,i] = vol_port     
+                    resultados[2,i] = r_port / vol_port 
                     betas_portafolios[i] = beta_port
 
+                # IDENTIFICACIÓN DE LOS 3 PERFILES
                 idx_optimo = np.argmax(resultados[2])
                 idx_conservador = np.argmin(resultados[1])
+                idx_agresivo = np.argmax(resultados[0]) 
                 
                 st.write("")
                 st.markdown("<h3 style='text-align: center;'>Métricas de los Portafolios Recomendados</h3>", unsafe_allow_html=True)
                 
-                col_met1, col_met2 = st.columns(2)
+                # 3 COLUMNAS DE MÉTRICAS
+                col_met1, col_met2, col_met3 = st.columns(3)
+                
                 with col_met1:
                     st.markdown("<div style='background-color:rgba(255, 75, 75, 0.1); padding:10px; border-radius:10px; border:1px solid #FF4B4B;'>", unsafe_allow_html=True)
-                    st.markdown(f"<h4 style='color:#FF4B4B; text-align:center;'>Portafolio Óptimo (Sharpe)</h4>", unsafe_allow_html=True)
-                    m1, m2, m3 = st.columns(3)
+                    st.markdown(f"<h4 style='color:#FF4B4B; text-align:center;'>Perfil Óptimo (Sharpe)</h4>", unsafe_allow_html=True)
+                    m1, m2 = st.columns(2)
                     m1.metric("Retorno Esperado", f"{resultados[0, idx_optimo]:.2%}")
-                    m2.metric("Riesgo (Volatilidad)", f"{resultados[1, idx_optimo]:.2%}")
-                    m3.metric("Coeficiente Beta", f"{betas_portafolios[idx_optimo]:.2f}")
+                    m2.metric("Coeficiente Beta", f"{betas_portafolios[idx_optimo]:.2f}")
                     st.markdown("</div>", unsafe_allow_html=True)
                     
                 with col_met2:
                     st.markdown("<div style='background-color:rgba(0, 191, 255, 0.1); padding:10px; border-radius:10px; border:1px solid #00BFFF;'>", unsafe_allow_html=True)
-                    st.markdown(f"<h4 style='color:#00BFFF; text-align:center;'>Portafolio Conservador</h4>", unsafe_allow_html=True)
-                    m4, m5, m6 = st.columns(3)
-                    m4.metric("Retorno Esperado", f"{resultados[0, idx_conservador]:.2%}")
-                    m5.metric("Riesgo (Volatilidad)", f"{resultados[1, idx_conservador]:.2%}")
-                    m6.metric("Coeficiente Beta", f"{betas_portafolios[idx_conservador]:.2f}")
+                    st.markdown(f"<h4 style='color:#00BFFF; text-align:center;'>Perfil Conservador</h4>", unsafe_allow_html=True)
+                    m3, m4 = st.columns(2)
+                    m3.metric("Retorno Esperado", f"{resultados[0, idx_conservador]:.2%}")
+                    m4.metric("Coeficiente Beta", f"{betas_portafolios[idx_conservador]:.2f}")
+                    st.markdown("</div>", unsafe_allow_html=True)
+                    
+                with col_met3:
+                    st.markdown("<div style='background-color:rgba(139, 92, 246, 0.1); padding:10px; border-radius:10px; border:1px solid #8B5CF6;'>", unsafe_allow_html=True)
+                    st.markdown(f"<h4 style='color:#8B5CF6; text-align:center;'>Perfil Agresivo</h4>", unsafe_allow_html=True)
+                    m5, m6 = st.columns(2)
+                    m5.metric("Retorno Esperado", f"{resultados[0, idx_agresivo]:.2%}")
+                    m6.metric("Coeficiente Beta", f"{betas_portafolios[idx_agresivo]:.2f}")
                     st.markdown("</div>", unsafe_allow_html=True)
 
-                # --- NUEVO: GRÁFICO DE PUNTOS MARKOWITZ (FRONTERA EFICIENTE) ---
+                # GRÁFICO DE PUNTOS (FRONTERA EFICIENTE)
                 fig_scatter = go.Figure()
-                # Los 3000 punticos
+                
+                # Nube de puntos
                 fig_scatter.add_trace(go.Scatter(
                     x=resultados[1,:], y=resultados[0,:], mode='markers',
                     marker=dict(color=resultados[2,:], colorscale='Viridis', size=6, opacity=0.7, colorbar=dict(title="Ratio Sharpe")),
                     name='Portafolios Simulados', hovertext=[f"Beta: {b:.2f}" for b in betas_portafolios]
                 ))
+                
                 # Estrella Roja (Óptimo)
                 fig_scatter.add_trace(go.Scatter(
                     x=[resultados[1, idx_optimo]], y=[resultados[0, idx_optimo]], mode='markers+text',
                     marker=dict(color='#FF4B4B', size=16, symbol='star', line=dict(width=2, color='white')),
-                    name='Máximo Sharpe', text=['Perfil Óptimo'], textposition='top center', textfont=dict(color='#FF4B4B', size=14)
+                    name='Máximo Sharpe', text=['Óptimo'], textposition='top left', textfont=dict(color='#FF4B4B', size=15)
                 ))
+                
                 # Estrella Azul (Conservador)
                 fig_scatter.add_trace(go.Scatter(
                     x=[resultados[1, idx_conservador]], y=[resultados[0, idx_conservador]], mode='markers+text',
                     marker=dict(color='#00BFFF', size=16, symbol='star', line=dict(width=2, color='white')),
-                    name='Mínima Varianza', text=['Perfil Conservador'], textposition='bottom center', textfont=dict(color='#00BFFF', size=14)
+                    name='Mínima Varianza', text=['Conservador'], textposition='bottom right', textfont=dict(color='#00BFFF', size=15)
+                ))
+
+                # Estrella Morada (Agresivo)
+                fig_scatter.add_trace(go.Scatter(
+                    x=[resultados[1, idx_agresivo]], y=[resultados[0, idx_agresivo]], mode='markers+text',
+                    marker=dict(color='#8B5CF6', size=16, symbol='star', line=dict(width=2, color='white')),
+                    name='Máximo Retorno', text=['Agresivo'], textposition='top right', textfont=dict(color='#8B5CF6', size=15)
                 ))
                 
                 fig_scatter.update_layout(title="Frontera Eficiente de Markowitz (Riesgo vs. Retorno)", xaxis_title="Riesgo (Volatilidad Anualizada)", yaxis_title="Retorno Esperado Anualizado", template="plotly_dark", height=600, paper_bgcolor='rgba(0,0,0,0.5)', plot_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_scatter, use_container_width=True)
                 
-                # Tortas centradas
+                # 3 TORTAS DE COMPOSICIÓN
                 st.markdown("<h3 style='text-align: center; margin-top: 20px;'>Estructura Porcentual Recomendada</h3>", unsafe_allow_html=True)
-                cp1, cp2 = st.columns(2)
+                cp1, cp2, cp3 = st.columns(3)
                 
                 with cp1:
                     f_opt = px.pie(values=pesos_guardados[idx_optimo], names=opciones_portafolio, hole=0.5, color_discrete_sequence=px.colors.sequential.Reds_r)
-                    f_opt.update_traces(textposition='outside', textinfo='percent+label', textfont_size=13)
-                    f_opt.update_layout(title=dict(text="Composición: Perfil Óptimo", x=0.5, font=dict(color="#FF4B4B", size=20)), template="plotly_dark", showlegend=False, height=500, paper_bgcolor='rgba(0,0,0,0)')
+                    f_opt.update_traces(textposition='inside', textinfo='percent+label', textfont_size=12)
+                    f_opt.update_layout(title=dict(text="Perfil Óptimo", x=0.5, font=dict(color="#FF4B4B", size=18)), template="plotly_dark", showlegend=False, height=450, paper_bgcolor='rgba(0,0,0,0)', margin=dict(t=50, b=50, l=10, r=10))
                     st.plotly_chart(f_opt, use_container_width=True)
+                    
                 with cp2:
                     f_cons = px.pie(values=pesos_guardados[idx_conservador], names=opciones_portafolio, hole=0.5, color_discrete_sequence=px.colors.sequential.Blues_r)
-                    f_cons.update_traces(textposition='outside', textinfo='percent+label', textfont_size=13)
-                    f_cons.update_layout(title=dict(text="Composición: Perfil Conservador", x=0.5, font=dict(color="#00BFFF", size=20)), template="plotly_dark", showlegend=False, height=500, paper_bgcolor='rgba(0,0,0,0)')
+                    f_cons.update_traces(textposition='inside', textinfo='percent+label', textfont_size=12)
+                    f_cons.update_layout(title=dict(text="Perfil Conservador", x=0.5, font=dict(color="#00BFFF", size=18)), template="plotly_dark", showlegend=False, height=450, paper_bgcolor='rgba(0,0,0,0)', margin=dict(t=50, b=50, l=10, r=10))
                     st.plotly_chart(f_cons, use_container_width=True)
 
-                st.markdown(f"""
-                <div class="conclusion-box">
-                    <h3 style="margin-top: 0; color: #3B82F6;">Síntesis Estratégica de Asignación de Capital</h3>
-                    <p>La <b>Frontera Eficiente</b> (Gráfico de dispersión) representa 3,000 combinaciones posibles con sus 7 activos. El eje X es el riesgo que asume y el eje Y es la ganancia que recibe. Observe el <b>Coeficiente Beta</b> calculado para tomar su decisión final:</p>
-                    <ul>
-                        <li><b>Perfil Óptimo (Beta: {betas_portafolios[idx_optimo]:.2f}):</b> Matemáticamente es el mejor punto de la frontera. Un Beta cercano o mayor a 1.0 significa que el portafolio se moverá a la misma velocidad o más rápido que el mercado (S&P 500). Ideal si el mercado está en tendencia alcista.</li>
-                        <li><b>Perfil Conservador (Beta: {betas_portafolios[idx_conservador]:.2f}):</b> Se ubica en el extremo izquierdo de la frontera (el punto de menor riesgo posible). Su Beta suele ser mucho menor a 1.0, lo que significa que actuará como un amortiguador si el mercado financiero colapsa.</li>
-                    </ul>
-                </div>
-                """, unsafe_allow_html=True)
+                with cp3:
+                    f_agr = px.pie(values=pesos_guardados[idx_agresivo], names=opciones_portafolio, hole=0.
