@@ -15,37 +15,30 @@ st.markdown("""
     <style>
     #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
     
-    /* Fondo global iluminado */
     .stApp {
         background: linear-gradient(rgba(14, 20, 31, 0.65), rgba(14, 20, 31, 0.85)), 
                     url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070');
         background-size: cover; background-position: center; background-attachment: fixed;
     }
     
-    /* Botones con gradiente Azul Ejecutivo */
     .stButton>button {
         background: linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%); 
         color: white; border-radius: 8px; border: none; font-weight: bold; width: 100%; padding: 12px; transition: transform 0.2s;
     }
     .stButton>button:hover { transform: scale(1.01); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5); }
     
-    /* Estilos personalizados para las etiquetas seleccionadas (Tags Azules) */
     span[data-baseweb="tag"] { background-color: rgba(59, 130, 246, 0.25) !important; border: 1px solid #3B82F6 !important; color: #FFFFFF !important; }
     span[data-baseweb="tag"] svg { fill: #FFFFFF !important; }
-    
     div[role="radiogroup"] > label > div:first-child { accent-color: #3B82F6 !important; }
     
-    /* Cajas de métricas */
     div[data-testid="metric-container"] {
         background-color: rgba(30, 33, 48, 0.85); backdrop-filter: blur(10px); border-left: 5px solid #3B82F6; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
     
-    /* Cajas de conclusiones Azules */
     .conclusion-box {
         background-color: rgba(29, 78, 216, 0.15); backdrop-filter: blur(10px); border-left: 5px solid #3B82F6; padding: 25px; border-radius: 8px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
-    /* Banner Hero Híbrido */
     .hero-banner { 
         background-color: rgba(14, 20, 31, 0.5); backdrop-filter: blur(8px); padding: 80px 40px; border-radius: 15px; text-align: center; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.1); 
     }
@@ -55,7 +48,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. DICCIONARIO DE 35 ACTIVOS (DIVERSIFICADOS EN 7 SECTORES)
+# 2. DICCIONARIOS DE ACTIVOS Y PERFILES EN ESPAÑOL
 # ==========================================
 activos_dict = {
     "Apple (AAPL) - Tecnología": "AAPL", "Microsoft (MSFT) - Tecnología": "MSFT", "Nvidia (NVDA) - Tecnología": "NVDA", "Alphabet (GOOGL) - Tecnología": "GOOGL", "Meta Platforms (META) - Tecnología": "META",
@@ -68,8 +61,47 @@ activos_dict = {
 }
 nombres_activos = list(activos_dict.keys())
 
+# Base de datos local para que la presentación cargue de forma instantánea y en perfecto español
+perfiles_es = {
+    "AAPL": {"sector": "Tecnología", "industria": "Electrónica de Consumo", "resumen": "Diseña, fabrica y comercializa dispositivos móviles, computadoras y wearables a nivel mundial, destacando por su ecosistema iOS y servicios digitales."},
+    "MSFT": {"sector": "Tecnología", "industria": "Software / Nube", "resumen": "Líder global en software, servicios en la nube (Azure) y hardware. Domina el mercado de sistemas operativos y herramientas de productividad empresarial."},
+    "NVDA": {"sector": "Tecnología", "industria": "Semiconductores", "resumen": "Pionera en unidades de procesamiento gráfico (GPU) e inteligencia artificial. Sus chips son fundamentales para el desarrollo de IA, gaming y centros de datos."},
+    "GOOGL": {"sector": "Tecnología", "industria": "Servicios de Internet", "resumen": "Motor de búsqueda líder mundial, domina la publicidad digital, el ecosistema Android, computación en la nube y desarrollo avanzado de Inteligencia Artificial."},
+    "META": {"sector": "Tecnología", "industria": "Redes Sociales", "resumen": "Opera las plataformas de redes sociales más grandes del mundo (Facebook, Instagram, WhatsApp) y lidera el desarrollo de tecnologías de realidad virtual y metaverso."},
+    "JPM": {"sector": "Finanzas", "industria": "Banca Diversificada", "resumen": "Una de las instituciones financieras más grandes del mundo, ofreciendo servicios de banca de inversión, servicios financieros para consumidores y gestión de activos."},
+    "V": {"sector": "Finanzas", "industria": "Servicios de Crédito", "resumen": "Red global de pagos digitales que conecta a consumidores, comerciantes, instituciones financieras y gobiernos en más de 200 países y territorios."},
+    "MA": {"sector": "Finanzas", "industria": "Servicios de Crédito", "resumen": "Empresa tecnológica multinacional en la industria global de pagos, facilitando el procesamiento de transacciones electrónicas en todo el mundo."},
+    "BAC": {"sector": "Finanzas", "industria": "Banca Diversificada", "resumen": "Institución financiera multinacional que ofrece una amplia gama de servicios bancarios, de inversión y de gestión de patrimonio para individuos y empresas."},
+    "GS": {"sector": "Finanzas", "industria": "Mercados de Capitales", "resumen": "Firma global líder en banca de inversión, valores y gestión de inversiones que atiende a corporaciones, instituciones financieras y gobiernos."},
+    "JNJ": {"sector": "Salud", "industria": "Farmacéutica", "resumen": "Gigante diversificado del sector salud que investiga, desarrolla y comercializa productos farmacéuticos, dispositivos médicos y bienes de consumo masivo."},
+    "UNH": {"sector": "Salud", "industria": "Planes de Salud", "resumen": "Empresa de seguros de salud y servicios médicos diversificados, proporcionando beneficios y cobertura a millones de personas a nivel mundial."},
+    "LLY": {"sector": "Salud", "industria": "Farmacéutica", "resumen": "Compañía farmacéutica global enfocada en el descubrimiento y desarrollo de medicamentos innovadores para la diabetes, oncología y neurociencias."},
+    "PFE": {"sector": "Salud", "industria": "Farmacéutica", "resumen": "Una de las mayores empresas biofarmacéuticas del mundo, famosa por descubrir y desarrollar medicamentos y vacunas para diversas áreas terapéuticas."},
+    "ABBV": {"sector": "Salud", "industria": "Biotecnología", "resumen": "Compañía biofarmacéutica basada en la investigación, enfocada en desarrollar terapias avanzadas en inmunología, oncología, virología y neurociencia."},
+    "AMZN": {"sector": "Consumo", "industria": "Comercio Electrónico / Nube", "resumen": "Gigante del comercio electrónico minorista y proveedor líder de infraestructura de computación en la nube (AWS) a nivel mundial."},
+    "TSLA": {"sector": "Consumo", "industria": "Fabricación de Automóviles", "resumen": "Diseña, desarrolla y fabrica vehículos eléctricos de alto rendimiento, así como sistemas de generación y almacenamiento de energía limpia y paneles solares."},
+    "WMT": {"sector": "Consumo Básico", "industria": "Supermercados", "resumen": "La corporación minorista más grande del mundo, operando una cadena global de hipermercados, tiendas de descuento y supermercados."},
+    "KO": {"sector": "Consumo Básico", "industria": "Bebidas no alcohólicas", "resumen": "La empresa líder de bebidas a nivel global, propietaria y comercializadora de algunas de las marcas de refrescos, jugos y aguas más reconocidas."},
+    "PEP": {"sector": "Consumo Básico", "industria": "Bebidas y Snacks", "resumen": "Compañía multinacional de alimentos, aperitivos y bebidas, con un portafolio que incluye marcas populares globalmente como Frito-Lay y Gatorade."},
+    "XOM": {"sector": "Energía", "industria": "Petróleo y Gas", "resumen": "Una de las mayores compañías petroleras y petroquímicas del mundo que cotizan en bolsa, explorando y produciendo energía a nivel global."},
+    "CVX": {"sector": "Energía", "industria": "Petróleo y Gas", "resumen": "Corporación energética multinacional que participa en todos los aspectos de las industrias del petróleo, gas natural y fuentes de energía alternativas."},
+    "CAT": {"sector": "Industrial", "industria": "Maquinaria Pesada", "resumen": "Fabricante líder mundial de equipos de construcción y minería, motores diésel y de gas natural, turbinas industriales y locomotoras."},
+    "GE": {"sector": "Industrial", "industria": "Conglomerado", "resumen": "Compañía industrial y tecnológica multinacional con un fuerte enfoque actual en la aviación, sistemas de energía y energías renovables."},
+    "LMT": {"sector": "Industrial", "industria": "Aeroespacial y Defensa", "resumen": "Compañía global de seguridad y aeroespacial dedicada a la investigación, diseño y fabricación de sistemas de tecnología avanzada militar y civil."},
+    "DIS": {"sector": "Entretenimiento", "industria": "Medios y Parques", "resumen": "Conglomerado multinacional de medios y entretenimiento, operando redes de televisión, parques temáticos, estudios de producción y streaming."},
+    "NFLX": {"sector": "Entretenimiento", "industria": "Streaming de Video", "resumen": "El servicio líder de entretenimiento por streaming en el mundo, ofreciendo una amplia variedad de series, documentales y largometrajes originales."},
+    "CMCSA": {"sector": "Telecomunicaciones", "industria": "TV por Cable / Internet", "resumen": "Conglomerado global de telecomunicaciones y medios, uno de los mayores proveedores de servicios de radiodifusión, cable y conectividad a internet."},
+    "T": {"sector": "Telecomunicaciones", "industria": "Servicios de Comunicación", "resumen": "Holding que provee servicios de telecomunicaciones, medios y tecnología a nivel mundial, incluyendo redes móviles e internet de banda ancha."},
+    "VZ": {"sector": "Telecomunicaciones", "industria": "Servicios de Comunicación", "resumen": "Proveedor líder de servicios de comunicaciones, tecnología, información y entretenimiento móvil para consumidores y empresas a nivel mundial."},
+    "SPY": {"sector": "Refugio / ETF", "industria": "Índice de Mercado", "resumen": "Fondo cotizado (ETF) que busca replicar el rendimiento del índice S&P 500, permitiendo invertir simultáneamente en las 500 empresas más grandes de EE. UU."},
+    "GLD": {"sector": "Refugio / ETF", "industria": "Materias Primas", "resumen": "Fondo de inversión (ETF) diseñado para rastrear el precio del oro físico, ofreciendo a los inversores un activo de refugio seguro en tiempos de incertidumbre."},
+    "TLT": {"sector": "Refugio / ETF", "industria": "Bonos Gubernamentales", "resumen": "Fondo (ETF) que busca replicar los resultados de un índice compuesto por bonos del Tesoro de EE. UU. con vencimientos superiores a 20 años (deuda segura)."},
+    "BTC-USD": {"sector": "Criptomoneda", "industria": "Activo Digital", "resumen": "La primera y más grande criptomoneda descentralizada del mundo, basada en tecnología blockchain y utilizada como activo digital y reserva de valor."},
+    "ETH-USD": {"sector": "Criptomoneda", "industria": "Contratos Inteligentes", "resumen": "Plataforma de software descentralizada basada en blockchain, famosa por su criptomoneda (Ether) y por ser la red principal para ejecutar contratos inteligentes."}
+}
+
 # ==========================================
-# 3. BANNER PRINCIPAL (HÍBRIDO: FRASE + ORIENTACIÓN)
+# 3. BANNER PRINCIPAL
 # ==========================================
 st.markdown("""
 <div class="hero-banner">
@@ -116,20 +148,22 @@ if fechas_validas:
     if btn_comparar:
         if len(activos_comparar) > 0:
             tcks_comp = [activos_dict[ac] for ac in activos_comparar]
-            with st.spinner("Descargando perfiles corporativos y series de tiempo..."):
+            with st.spinner("Procesando series de tiempo..."):
                 
                 st.markdown("<h4 style='text-align: center; margin-top: 20px; color: #3B82F6;'>Perfil Corporativo de los Activos Seleccionados</h4>", unsafe_allow_html=True)
                 cols_info = st.columns(len(tcks_comp))
+                
+                # Renderizado de perfiles en español de forma instantánea
                 for idx, ticker in enumerate(tcks_comp):
                     with cols_info[idx]:
-                        try:
-                            info = yf.Ticker(ticker).info
-                            sector = info.get('sector', 'ETF / Índice de Mercado')
-                            industria = info.get('industry', 'Diversificado')
-                            resumen = info.get('longBusinessSummary', 'Información detallada no disponible para este activo en la base de datos actual.')[:250] + "..."
-                            st.markdown(f"**{ticker}**<br>🛡️ Sector: {sector}<br>⚙️ Industria: {industria}<br>_{resumen}_", unsafe_allow_html=True)
-                        except:
-                            st.markdown(f"**{ticker}**<br>Datos corporativos no disponibles.", unsafe_allow_html=True)
+                        if ticker in perfiles_es:
+                            sector = perfiles_es[ticker]["sector"]
+                            industria = perfiles_es[ticker]["industria"]
+                            resumen = perfiles_es[ticker]["resumen"]
+                        else:
+                            sector, industria, resumen = "Desconocido", "Desconocido", "Datos corporativos no disponibles en la base."
+                        
+                        st.markdown(f"**{ticker}**<br>🛡️ Sector: {sector}<br>⚙️ Industria: {industria}<br>_{resumen}_", unsafe_allow_html=True)
                 
                 data_comp = yf.download(tcks_comp, start=fecha_inicio, end=fecha_fin)['Close']
                 fig_comp = go.Figure()
@@ -247,7 +281,7 @@ if fechas_validas:
                 
                 with col_met1:
                     st.markdown("<div style='background-color:rgba(255, 75, 75, 0.1); padding:10px; border-radius:10px; border:1px solid #FF4B4B;'>", unsafe_allow_html=True)
-                    st.markdown(f"<h4 style='color:#FF4B4B; text-align:center;'>Perfil Óptimo (Sharpe)</h4>", unsafe_allow_html=True)
+                    st.markdown(f"<h4 style='color:#FF4B4B; text-align:center;'>Perfil Óptimo</h4>", unsafe_allow_html=True)
                     m1, m2 = st.columns(2)
                     m1.metric("Retorno Esperado", f"{resultados[0, idx_optimo]:.2%}")
                     m2.metric("Coeficiente Beta", f"{betas_portafolios[idx_optimo]:.2f}")
