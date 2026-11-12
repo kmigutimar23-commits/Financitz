@@ -149,7 +149,7 @@ if fechas_validas:
                 for ticker in tcks_comp:
                     fig_comp.add_trace(go.Scatter(x=data_norm.index, y=data_norm[ticker], mode='lines', name=ticker, line=dict(width=3)))
                 
-                fig_comp.update_layout(title="Proyección de Crecimiento (Base \$100 USD)", template="plotly_dark", hovermode="x unified", height=450, margin=dict(l=20, r=20, t=50, b=20), paper_bgcolor='rgba(0,0,0,0.5)', plot_bgcolor='rgba(0,0,0,0)')
+                fig_comp.update_layout(title="Proyección de Crecimiento (Base $100 USD)", template="plotly_dark", hovermode="x unified", height=450, margin=dict(l=20, r=20, t=50, b=20), paper_bgcolor='rgba(0,0,0,0.5)', plot_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_comp, use_container_width=True)
 
                 if len(tcks_comp) > 1:
@@ -314,4 +314,23 @@ if fechas_validas:
                     st.plotly_chart(f_cons, use_container_width=True)
 
                 with cp3:
-                    f_agr = px.pie(values=pesos_guardados[idx_agresivo], names=opciones_portafolio, hole=0.
+                    f_agr = px.pie(values=pesos_guardados[idx_agresivo], names=opciones_portafolio, hole=0.5, color_discrete_sequence=px.colors.sequential.Purples_r)
+                    f_agr.update_traces(textposition='inside', textinfo='percent+label', textfont_size=12)
+                    f_agr.update_layout(title=dict(text="Perfil Agresivo", x=0.5, font=dict(color="#8B5CF6", size=18)), template="plotly_dark", showlegend=False, height=450, paper_bgcolor='rgba(0,0,0,0)', margin=dict(t=50, b=50, l=10, r=10))
+                    st.plotly_chart(f_agr, use_container_width=True)
+
+                activo_fuerte_optimo = opciones_portafolio[np.argmax(pesos_guardados[idx_optimo])]
+                activo_fuerte_cons = opciones_portafolio[np.argmax(pesos_guardados[idx_conservador])]
+                activo_fuerte_agr = opciones_portafolio[np.argmax(pesos_guardados[idx_agresivo])]
+                
+                st.markdown(f"""
+                <div class="conclusion-box">
+                    <h3 style="margin-top: 0; color: #3B82F6;">Síntesis Estratégica de Asignación de Capital</h3>
+                    <p>La <b>Frontera Eficiente</b> (Gráfico de dispersión) representa 3,000 combinaciones posibles. Seleccione su estructura ideal basándose en el <b>Coeficiente Beta</b> (Sensibilidad al mercado) y su tolerancia al riesgo:</p>
+                    <ul>
+                        <li><span style="color:#FF4B4B; font-weight:bold;">Perfil Óptimo (Beta: {betas_portafolios[idx_optimo]:.2f}):</span> Matemáticamente es el punto con mejor equilibrio (Máximo Ratio de Sharpe). Liderado por <b>{activo_fuerte_optimo}</b>, este portafolio compensa inteligentemente cada punto de riesgo asumido con un nivel de rentabilidad justificado.</li>
+                        <li><span style="color:#00BFFF; font-weight:bold;">Perfil Conservador (Beta: {betas_portafolios[idx_conservador]:.2f}):</span> Se ubica en el extremo izquierdo de la frontera. Concentra su peso en <b>{activo_fuerte_cons}</b>, buscando minimizar la volatilidad a toda costa. Actúa como un amortiguador cuando los mercados financieros colapsan.</li>
+                        <li><span style="color:#8B5CF6; font-weight:bold;">Perfil Agresivo (Beta: {betas_portafolios[idx_agresivo]:.2f}):</span> Se encuentra en la punta superior derecha. Concentra la mayor parte del capital en <b>{activo_fuerte_agr}</b> para extraer el retorno absoluto más alto posible, ignorando por completo la estabilidad. Recomendado exclusivamente para capital de alto riesgo.</li>
+                    </ul>
+                </div>
+                """, unsafe_allow_html=True)
