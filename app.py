@@ -58,22 +58,16 @@ st.markdown("""
 # 2. DICCIONARIO DE 35 ACTIVOS (DIVERSIFICADOS EN 7 SECTORES)
 # ==========================================
 activos_dict = {
-    # 1. Tecnología (5)
     "Apple (AAPL) - Tecnología": "AAPL", "Microsoft (MSFT) - Tecnología": "MSFT", "Nvidia (NVDA) - Tecnología": "NVDA", "Alphabet (GOOGL) - Tecnología": "GOOGL", "Meta Platforms (META) - Tecnología": "META",
-    # 2. Finanzas (5)
     "JPMorgan Chase (JPM) - Finanzas": "JPM", "Visa (V) - Finanzas": "V", "Mastercard (MA) - Finanzas": "MA", "Bank of America (BAC) - Finanzas": "BAC", "Goldman Sachs (GS) - Finanzas": "GS",
-    # 3. Salud (5)
     "Johnson & Johnson (JNJ) - Salud": "JNJ", "UnitedHealth (UNH) - Salud": "UNH", "Eli Lilly (LLY) - Salud": "LLY", "Pfizer (PFE) - Salud": "PFE", "AbbVie (ABBV) - Salud": "ABBV",
-    # 4. Consumo (5)
     "Amazon (AMZN) - Consumo Discrecional": "AMZN", "Tesla (TSLA) - Consumo Discrecional": "TSLA", "Walmart (WMT) - Consumo Básico": "WMT", "Coca-Cola (KO) - Consumo Básico": "KO", "PepsiCo (PEP) - Consumo Básico": "PEP",
-    # 5. Energía e Industria (5)
     "Exxon Mobil (XOM) - Energía": "XOM", "Chevron (CVX) - Energía": "CVX", "Caterpillar (CAT) - Industrial": "CAT", "General Electric (GE) - Industrial": "GE", "Lockheed Martin (LMT) - Industrial": "LMT",
-    # 6. Telecomunicaciones y Entretenimiento (5)
     "Walt Disney (DIS) - Entretenimiento": "DIS", "Netflix (NFLX) - Entretenimiento": "NFLX", "Comcast (CMCSA) - Telecom": "CMCSA", "AT&T (T) - Telecom": "T", "Verizon (VZ) - Telecom": "VZ",
-    # 7. Refugios, ETFs y Cripto (5)
     "S&P 500 (SPY) - Mercado EE.UU.": "SPY", "SPDR Gold (GLD) - ETF Oro": "GLD", "Bonos del Tesoro (TLT) - Refugio": "TLT", "Bitcoin (BTC-USD) - Criptomoneda": "BTC-USD", "Ethereum (ETH-USD) - Criptomoneda": "ETH-USD"
 }
 nombres_activos = list(activos_dict.keys())
+
 # ==========================================
 # 3. BANNER PRINCIPAL (HÍBRIDO: FRASE + ORIENTACIÓN)
 # ==========================================
@@ -85,6 +79,7 @@ st.markdown("""
 <p style="color: #CBD5E1; font-size: 1.15em; max-width: 700px; margin: 0 auto; line-height: 1.5; border-top: 1px solid rgba(59, 130, 246, 0.3); padding-top: 20px;">Defina su horizonte de inversión para evaluar el mercado y deje que nuestro motor algorítmico construya la estrategia que mejor equilibre su riesgo y rentabilidad.</p>
 </div>
 """, unsafe_allow_html=True)
+
 # ==========================================
 # 4. SELECCIÓN DE HISTÓRICO DE DATOS
 # ==========================================
@@ -123,7 +118,6 @@ if fechas_validas:
             tcks_comp = [activos_dict[ac] for ac in activos_comparar]
             with st.spinner("Descargando perfiles corporativos y series de tiempo..."):
                 
-                # Desplegar Información de las Empresas
                 st.markdown("<h4 style='text-align: center; margin-top: 20px; color: #3B82F6;'>Perfil Corporativo de los Activos Seleccionados</h4>", unsafe_allow_html=True)
                 cols_info = st.columns(len(tcks_comp))
                 for idx, ticker in enumerate(tcks_comp):
@@ -137,7 +131,6 @@ if fechas_validas:
                         except:
                             st.markdown(f"**{ticker}**<br>Datos corporativos no disponibles.", unsafe_allow_html=True)
                 
-                # Gráfico Comparativo
                 data_comp = yf.download(tcks_comp, start=fecha_inicio, end=fecha_fin)['Close']
                 fig_comp = go.Figure()
                 if len(tcks_comp) == 1:
@@ -167,17 +160,15 @@ if fechas_validas:
     # ==========================================
     st.markdown("<h2 style='text-align: center;'>Fase II: Frontera Eficiente (Modelo Markowitz)</h2>", unsafe_allow_html=True)
     
-col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
+    col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
     with col_o2:
         modo = st.radio("Estrategia de Estructuración:", ["Asistente de Diversificación Inteligente", "Selección Manual de Activos"], horizontal=True)
         
         if modo == "Selección Manual de Activos":
             opciones_portafolio = st.multiselect("Defina el universo de activos a optimizar:", nombres_activos, default=["Apple (AAPL) - Tecnología", "Johnson & Johnson (JNJ) - Salud", "Exxon Mobil (XOM) - Energía"])
         else:
-            # EL NUEVO ASISTENTE INTELIGENTE PARA LOS 35 ACTIVOS
             favorita = st.selectbox("Seleccione un activo núcleo (Core Asset):", nombres_activos)
             
-            # Agrupación interna de los 35 activos para el algoritmo
             sectores_algoritmo = {
                 "Tecnología": ["Apple (AAPL) - Tecnología", "Microsoft (MSFT) - Tecnología", "Nvidia (NVDA) - Tecnología", "Alphabet (GOOGL) - Tecnología", "Meta Platforms (META) - Tecnología"],
                 "Finanzas": ["JPMorgan Chase (JPM) - Finanzas", "Visa (V) - Finanzas", "Mastercard (MA) - Finanzas", "Bank of America (BAC) - Finanzas", "Goldman Sachs (GS) - Finanzas"],
@@ -191,20 +182,18 @@ col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
             recomendacion = [favorita]
             categoria_fav = None
             
-            # 1. Identificamos a qué sector pertenece la acción que elegiste
             for sector, lista_activos in sectores_algoritmo.items():
                 if favorita in lista_activos:
                     categoria_fav = sector
                     break
             
-            # 2. Rellenamos el portafolio con 1 activo líder de cada uno de los OTROS sectores
             for sector, lista_activos in sectores_algoritmo.items():
                 if sector != categoria_fav:
-                    recomendacion.append(lista_activos[0]) # Toma el primero como representante defensivo
+                    recomendacion.append(lista_activos[0])
             
             opciones_portafolio = st.multiselect("Portafolio blindado sugerido por el algoritmo (7 Sectores):", nombres_activos, default=recomendacion)
         
-        opciones_portafolio = list(dict.fromkeys(opciones_portafolio)) # Limpieza automática de duplicados
+        opciones_portafolio = list(dict.fromkeys(opciones_portafolio))
         st.write("")
         simular_port_btn = st.button("Construir Frontera Eficiente")
 
@@ -213,7 +202,7 @@ col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
             st.error("El motor de cálculo requiere al menos 2 activos.")
         else:
             tcks_port = [activos_dict[op] for op in opciones_portafolio]
-            tcks_download = list(set(tcks_port + ['SPY'])) # Asegurar SPY para el Beta
+            tcks_download = list(set(tcks_port + ['SPY'])) 
             
             with st.spinner("Modelando 3,000 portafolios y calculando riesgo Beta..."):
                 data_all = yf.download(tcks_download, start=fecha_inicio, end=fecha_fin)['Close'].pct_change().dropna()
@@ -247,7 +236,6 @@ col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
                     resultados[2,i] = r_port / vol_port 
                     betas_portafolios[i] = beta_port
 
-                # IDENTIFICACIÓN DE LOS 3 PERFILES
                 idx_optimo = np.argmax(resultados[2])
                 idx_conservador = np.argmin(resultados[1])
                 idx_agresivo = np.argmax(resultados[0]) 
@@ -255,7 +243,6 @@ col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
                 st.write("")
                 st.markdown("<h3 style='text-align: center;'>Métricas de los Portafolios Recomendados</h3>", unsafe_allow_html=True)
                 
-                # 3 COLUMNAS DE MÉTRICAS
                 col_met1, col_met2, col_met3 = st.columns(3)
                 
                 with col_met1:
@@ -282,31 +269,26 @@ col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
                     m6.metric("Coeficiente Beta", f"{betas_portafolios[idx_agresivo]:.2f}")
                     st.markdown("</div>", unsafe_allow_html=True)
 
-                # GRÁFICO DE PUNTOS (FRONTERA EFICIENTE)
                 fig_scatter = go.Figure()
                 
-                # Nube de puntos
                 fig_scatter.add_trace(go.Scatter(
                     x=resultados[1,:], y=resultados[0,:], mode='markers',
                     marker=dict(color=resultados[2,:], colorscale='Viridis', size=6, opacity=0.7, colorbar=dict(title="Ratio Sharpe")),
                     name='Portafolios Simulados', hovertext=[f"Beta: {b:.2f}" for b in betas_portafolios]
                 ))
                 
-                # Estrella Roja (Óptimo)
                 fig_scatter.add_trace(go.Scatter(
                     x=[resultados[1, idx_optimo]], y=[resultados[0, idx_optimo]], mode='markers+text',
                     marker=dict(color='#FF4B4B', size=16, symbol='star', line=dict(width=2, color='white')),
                     name='Máximo Sharpe', text=['Óptimo'], textposition='top left', textfont=dict(color='#FF4B4B', size=15)
                 ))
                 
-                # Estrella Azul (Conservador)
                 fig_scatter.add_trace(go.Scatter(
                     x=[resultados[1, idx_conservador]], y=[resultados[0, idx_conservador]], mode='markers+text',
                     marker=dict(color='#00BFFF', size=16, symbol='star', line=dict(width=2, color='white')),
                     name='Mínima Varianza', text=['Conservador'], textposition='bottom right', textfont=dict(color='#00BFFF', size=15)
                 ))
 
-                # Estrella Morada (Agresivo)
                 fig_scatter.add_trace(go.Scatter(
                     x=[resultados[1, idx_agresivo]], y=[resultados[0, idx_agresivo]], mode='markers+text',
                     marker=dict(color='#8B5CF6', size=16, symbol='star', line=dict(width=2, color='white')),
@@ -316,7 +298,6 @@ col_o1, col_o2, col_o3 = st.columns([1, 4, 1])
                 fig_scatter.update_layout(title="Frontera Eficiente de Markowitz (Riesgo vs. Retorno)", xaxis_title="Riesgo (Volatilidad Anualizada)", yaxis_title="Retorno Esperado Anualizado", template="plotly_dark", height=600, paper_bgcolor='rgba(0,0,0,0.5)', plot_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_scatter, use_container_width=True)
                 
-                # 3 TORTAS DE COMPOSICIÓN
                 st.markdown("<h3 style='text-align: center; margin-top: 20px;'>Estructura Porcentual Recomendada</h3>", unsafe_allow_html=True)
                 cp1, cp2, cp3 = st.columns(3)
                 
