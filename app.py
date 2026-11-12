@@ -329,7 +329,24 @@ if fechas_validas:
                     name='Máximo Retorno', text=['Agresivo'], textposition='top right', textfont=dict(color='#8B5CF6', size=15)
                 ))
                 
-                fig_scatter.update_layout(title="Frontera Eficiente de Markowitz (Riesgo vs. Retorno)", xaxis_title="Riesgo (Volatilidad Anualizada)", yaxis_title="Retorno Esperado Anualizado", template="plotly_dark", height=600, paper_bgcolor='rgba(0,0,0,0.5)', plot_bgcolor='rgba(0,0,0,0)')
+                fig_scatter.update_layout(
+                    title="Frontera Eficiente de Markowitz (Riesgo vs. Retorno)", 
+                    xaxis_title="Riesgo (Volatilidad Anualizada)", 
+                    yaxis_title="Retorno Esperado Anualizado", 
+                    template="plotly_dark", 
+                    height=600, 
+                    paper_bgcolor='rgba(0,0,0,0.5)', 
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    legend=dict(
+                        yanchor="top", 
+                        y=0.99, 
+                        xanchor="left", 
+                        x=0.01, 
+                        bgcolor="rgba(0,0,0,0.5)",
+                        bordercolor="rgba(255,255,255,0.2)",
+                        borderwidth=1
+                    )
+                )
                 st.plotly_chart(fig_scatter, use_container_width=True)
                 
                 st.markdown("<h3 style='text-align: center; margin-top: 20px;'>Estructura Porcentual Recomendada</h3>", unsafe_allow_html=True)
