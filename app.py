@@ -61,7 +61,6 @@ activos_dict = {
 }
 nombres_activos = list(activos_dict.keys())
 
-# Base de datos local para que la presentación cargue de forma instantánea y en perfecto español
 perfiles_es = {
     "AAPL": {"sector": "Tecnología", "industria": "Electrónica de Consumo", "resumen": "Diseña, fabrica y comercializa dispositivos móviles, computadoras y wearables a nivel mundial, destacando por su ecosistema iOS y servicios digitales."},
     "MSFT": {"sector": "Tecnología", "industria": "Software / Nube", "resumen": "Líder global en software, servicios en la nube (Azure) y hardware. Domina el mercado de sistemas operativos y herramientas de productividad empresarial."},
@@ -101,7 +100,7 @@ perfiles_es = {
 }
 
 # ==========================================
-# 3. BANNER PRINCIPAL
+# 3. BANNER PRINCIPAL (HÍBRIDO)
 # ==========================================
 st.markdown("""
 <div class="hero-banner">
@@ -136,7 +135,7 @@ except ValueError:
 
 if fechas_validas:
     # ==========================================
-    # SECCIÓN 1: COMPARADOR CON INFORMACIÓN EMPRESARIAL
+    # SECCIÓN 1: COMPARADOR CON INFORMACIÓN EMPRESARIAL Y BETA
     # ==========================================
     st.markdown("<h2 style='text-align: center;'>Fase I: Análisis de Activos Individuales</h2>", unsafe_allow_html=True)
     
@@ -148,12 +147,17 @@ if fechas_validas:
     if btn_comparar:
         if len(activos_comparar) > 0:
             tcks_comp = [activos_dict[ac] for ac in activos_comparar]
-            with st.spinner("Procesando series de tiempo..."):
+            # Aseguramos descargar el SPY en Fase I para poder calcular el Beta de las acciones
+            tcks_descarga_f1 = list(set(tcks_comp + ['SPY']))
+            
+            with st.spinner("Procesando series de tiempo y calculando Betas..."):
+                data_f1 = yf.download(tcks_descarga_f1, start=fecha_inicio, end=fecha_fin)['Close']
+                retornos_f1 = data_f1.pct_change().dropna()
+                var_mercado_f1 = np.var(retornos_f1['SPY']) if 'SPY' in retornos_f1 else 1.0
                 
-                st.markdown("<h4 style='text-align: center; margin-top: 20px; color: #3B82F6;'>Perfil Corporativo de los Activos Seleccionados</h4>", unsafe_allow_html=True)
+                st.markdown("<h4 style='text-align: center; margin-top: 20px; color: #3B82F6;'>Perfil Corporativo y Riesgo Individual</h4>", unsafe_allow_html=True)
                 cols_info = st.columns(len(tcks_comp))
                 
-                # Renderizado de perfiles en español de forma instantánea
                 for idx, ticker in enumerate(tcks_comp):
                     with cols_info[idx]:
                         if ticker in perfiles_es:
@@ -161,11 +165,19 @@ if fechas_validas:
                             industria = perfiles_es[ticker]["industria"]
                             resumen = perfiles_es[ticker]["resumen"]
                         else:
-                            sector, industria, resumen = "Desconocido", "Desconocido", "Datos corporativos no disponibles en la base."
+                            sector, industria, resumen = "Desconocido", "Desconocido", "Datos corporativos no disponibles."
                         
-                        st.markdown(f"**{ticker}**<br>🛡️ Sector: {sector}<br>⚙️ Industria: {industria}<br>_{resumen}_", unsafe_allow_html=True)
+                        # Cálculo del Beta para mostrarlo en el Punto 1
+                        try:
+                            beta_val = np.cov(retornos_f1[ticker], retornos_f1['SPY'])[0,1] / var_mercado_f1
+                            beta_str = f"{beta_val:.2f}"
+                        except:
+                            beta_str = "N/A"
+                        
+                        st.markdown(f"**{ticker}**<br>🛡️ Sector: {sector}<br>⚙️ Industria: {industria}<br>📈 **Beta: {beta_str}**<br>_{resumen}_", unsafe_allow_html=True)
                 
-                data_comp = yf.download(tcks_comp, start=fecha_inicio, end=fecha_fin)['Close']
+                # Gráfico
+                data_comp = data_f1[tcks_comp]
                 fig_comp = go.Figure()
                 if len(tcks_comp) == 1:
                     data_norm = (data_comp / data_comp.iloc[0]) * 100
@@ -183,14 +195,14 @@ if fechas_validas:
                     st.markdown(f"""
                     <div class="conclusion-box">
                         <h3 style="margin-top: 0; color: #3B82F6;">Interpretación de Dinámica de Mercado</h3>
-                        <p>Observe cómo el <b>S&P 500 (SPY)</b> actúa como el termómetro general de la economía. Las acciones individuales que superan la línea del SPY generan mayores retornos, pero generalmente exponen su capital a caídas mucho más agresivas durante períodos de crisis. Conocer el negocio detrás de la acción (ver perfiles arriba) es el primer paso antes de optimizar matemáticamente.</p>
+                        <p>Observe cómo el <b>S&P 500 (SPY)</b> actúa como el termómetro general de la economía. Evalúe el <b>Beta</b> de cada empresa en los perfiles superiores: un Beta mayor a 1 significa que la acción es más agresiva y volátil que el mercado, mientras que un Beta menor a 1 indica que es más conservadora.</p>
                     </div>
                     """, unsafe_allow_html=True)
                 
     st.divider()
 
     # ==========================================
-    # SECCIÓN 2: OPTIMIZACIÓN Y FRONTERA EFICIENTE
+    # SECCIÓN 2: OPTIMIZACIÓN Y FRONTERA EFICIENTE (RIESGO EN MÚLTIPLES PERFILES)
     # ==========================================
     st.markdown("<h2 style='text-align: center;'>Fase II: Frontera Eficiente (Modelo Markowitz)</h2>", unsafe_allow_html=True)
     
@@ -238,7 +250,7 @@ if fechas_validas:
             tcks_port = [activos_dict[op] for op in opciones_portafolio]
             tcks_download = list(set(tcks_port + ['SPY'])) 
             
-            with st.spinner("Modelando 3,000 portafolios y calculando riesgo Beta..."):
+            with st.spinner("Modelando 3,000 portafolios..."):
                 data_all = yf.download(tcks_download, start=fecha_inicio, end=fecha_fin)['Close'].pct_change().dropna()
                 retornos = data_all[tcks_port]
                 retornos_mercado = data_all['SPY'] 
@@ -279,12 +291,13 @@ if fechas_validas:
                 
                 col_met1, col_met2, col_met3 = st.columns(3)
                 
+                # Se reemplazó el Beta por el Riesgo (Volatilidad) en la visualización del Punto 2
                 with col_met1:
                     st.markdown("<div style='background-color:rgba(255, 75, 75, 0.1); padding:10px; border-radius:10px; border:1px solid #FF4B4B;'>", unsafe_allow_html=True)
-                    st.markdown(f"<h4 style='color:#FF4B4B; text-align:center;'>Perfil Óptimo</h4>", unsafe_allow_html=True)
+                    st.markdown(f"<h4 style='color:#FF4B4B; text-align:center;'>Perfil Óptimo (Sharpe)</h4>", unsafe_allow_html=True)
                     m1, m2 = st.columns(2)
                     m1.metric("Retorno Esperado", f"{resultados[0, idx_optimo]:.2%}")
-                    m2.metric("Coeficiente Beta", f"{betas_portafolios[idx_optimo]:.2f}")
+                    m2.metric("Riesgo (Volatilidad)", f"{resultados[1, idx_optimo]:.2%}")
                     st.markdown("</div>", unsafe_allow_html=True)
                     
                 with col_met2:
@@ -292,7 +305,7 @@ if fechas_validas:
                     st.markdown(f"<h4 style='color:#00BFFF; text-align:center;'>Perfil Conservador</h4>", unsafe_allow_html=True)
                     m3, m4 = st.columns(2)
                     m3.metric("Retorno Esperado", f"{resultados[0, idx_conservador]:.2%}")
-                    m4.metric("Coeficiente Beta", f"{betas_portafolios[idx_conservador]:.2f}")
+                    m4.metric("Riesgo (Volatilidad)", f"{resultados[1, idx_conservador]:.2%}")
                     st.markdown("</div>", unsafe_allow_html=True)
                     
                 with col_met3:
@@ -300,7 +313,7 @@ if fechas_validas:
                     st.markdown(f"<h4 style='color:#8B5CF6; text-align:center;'>Perfil Agresivo</h4>", unsafe_allow_html=True)
                     m5, m6 = st.columns(2)
                     m5.metric("Retorno Esperado", f"{resultados[0, idx_agresivo]:.2%}")
-                    m6.metric("Coeficiente Beta", f"{betas_portafolios[idx_agresivo]:.2f}")
+                    m6.metric("Riesgo (Volatilidad)", f"{resultados[1, idx_agresivo]:.2%}")
                     st.markdown("</div>", unsafe_allow_html=True)
 
                 fig_scatter = go.Figure()
@@ -329,6 +342,7 @@ if fechas_validas:
                     name='Máximo Retorno', text=['Agresivo'], textposition='top right', textfont=dict(color='#8B5CF6', size=15)
                 ))
                 
+                # Se mantiene la leyenda en la esquina superior izquierda para que no tape la barra de colores
                 fig_scatter.update_layout(
                     title="Frontera Eficiente de Markowitz (Riesgo vs. Retorno)", 
                     xaxis_title="Riesgo (Volatilidad Anualizada)", 
@@ -377,11 +391,11 @@ if fechas_validas:
                 st.markdown(f"""
                 <div class="conclusion-box">
                     <h3 style="margin-top: 0; color: #3B82F6;">Síntesis Estratégica de Asignación de Capital</h3>
-                    <p>La <b>Frontera Eficiente</b> (Gráfico de dispersión) representa 3,000 combinaciones posibles. Seleccione su estructura ideal basándose en el <b>Coeficiente Beta</b> (Sensibilidad al mercado) y su tolerancia al riesgo:</p>
+                    <p>La <b>Frontera Eficiente</b> (Gráfico de dispersión) representa 3,000 combinaciones posibles. Seleccione su estructura ideal basándose en su tolerancia al <b>Riesgo (Volatilidad)</b>:</p>
                     <ul>
-                        <li><span style="color:#FF4B4B; font-weight:bold;">Perfil Óptimo (Beta: {betas_portafolios[idx_optimo]:.2f}):</span> Matemáticamente es el punto con mejor equilibrio (Máximo Ratio de Sharpe). Liderado por <b>{activo_fuerte_optimo}</b>, este portafolio compensa inteligentemente cada punto de riesgo asumido con un nivel de rentabilidad justificado.</li>
-                        <li><span style="color:#00BFFF; font-weight:bold;">Perfil Conservador (Beta: {betas_portafolios[idx_conservador]:.2f}):</span> Se ubica en el extremo izquierdo de la frontera. Concentra su peso en <b>{activo_fuerte_cons}</b>, buscando minimizar la volatilidad a toda costa. Actúa como un amortiguador cuando los mercados financieros colapsan.</li>
-                        <li><span style="color:#8B5CF6; font-weight:bold;">Perfil Agresivo (Beta: {betas_portafolios[idx_agresivo]:.2f}):</span> Se encuentra en la punta superior derecha. Concentra la mayor parte del capital en <b>{activo_fuerte_agr}</b> para extraer el retorno absoluto más alto posible, ignorando por completo la estabilidad. Recomendado exclusivamente para capital de alto riesgo.</li>
+                        <li><span style="color:#FF4B4B; font-weight:bold;">Perfil Óptimo (Riesgo: {resultados[1, idx_optimo]:.2%}):</span> Matemáticamente es el punto con mejor equilibrio (Máximo Ratio de Sharpe). Liderado por <b>{activo_fuerte_optimo}</b>, este portafolio compensa inteligentemente cada punto de riesgo asumido con un nivel de rentabilidad justificado.</li>
+                        <li><span style="color:#00BFFF; font-weight:bold;">Perfil Conservador (Riesgo: {resultados[1, idx_conservador]:.2%}):</span> Se ubica en el extremo izquierdo de la frontera. Concentra su peso en <b>{activo_fuerte_cons}</b>, buscando minimizar la volatilidad a toda costa. Actúa como un amortiguador cuando los mercados financieros colapsan.</li>
+                        <li><span style="color:#8B5CF6; font-weight:bold;">Perfil Agresivo (Riesgo: {resultados[1, idx_agresivo]:.2%}):</span> Se encuentra en la punta superior derecha. Concentra la mayor parte del capital en <b>{activo_fuerte_agr}</b> para extraer el retorno absoluto más alto posible, ignorando por completo la estabilidad. Recomendado exclusivamente para capital de alto riesgo.</li>
                     </ul>
                 </div>
                 """, unsafe_allow_html=True)
