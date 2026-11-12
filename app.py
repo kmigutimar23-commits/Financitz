@@ -74,23 +74,17 @@ activos_dict = {
     "S&P 500 (SPY) - Mercado EE.UU.": "SPY", "SPDR Gold (GLD) - ETF Oro": "GLD", "Bonos del Tesoro (TLT) - Refugio": "TLT", "Bitcoin (BTC-USD) - Criptomoneda": "BTC-USD", "Ethereum (ETH-USD) - Criptomoneda": "ETH-USD"
 }
 nombres_activos = list(activos_dict.keys())
-
 # ==========================================
 # 3. BANNER PRINCIPAL (HÍBRIDO: FRASE + ORIENTACIÓN)
 # ==========================================
 st.markdown("""
 <div class="hero-banner">
-    <h3 style="color: #FF4B4B; letter-spacing: 3px; text-transform: uppercase; font-weight: 800;">⚡ Financitz</h3>
-    
-    <h1 style="color: #FFFFFF; font-size: 3.2em; font-style: italic; margin-top: 15px; margin-bottom: 10px; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">"El retorno de la inversión es importante,<br>pero también lo es el grado de incertidumbre que lo rodea."</h1>
-    <h3 style="color: #3B82F6; font-weight: 400; margin-bottom: 25px;">- Harry Markowitz, Premio Nobel de Economía</h3>
-    
-    <p style="color: #CBD5E1; font-size: 1.15em; max-width: 700px; margin: 0 auto; line-height: 1.5; border-top: 1px solid rgba(59, 130, 246, 0.3); padding-top: 20px;">
-        Defina su horizonte de inversión para evaluar el mercado y deje que nuestro motor algorítmico construya la estrategia que mejor equilibre su riesgo y rentabilidad.
-    </p>
+<h3 style="color: #FF4B4B; letter-spacing: 3px; text-transform: uppercase; font-weight: 800;">⚡ Financitz</h3>
+<h1 style="color: #FFFFFF; font-size: 3.2em; font-style: italic; margin-top: 15px; margin-bottom: 10px; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">"El retorno de la inversión es importante,<br>pero también lo es el grado de incertidumbre que lo rodea."</h1>
+<h3 style="color: #3B82F6; font-weight: 400; margin-bottom: 25px;">- Harry Markowitz, Premio Nobel de Economía</h3>
+<p style="color: #CBD5E1; font-size: 1.15em; max-width: 700px; margin: 0 auto; line-height: 1.5; border-top: 1px solid rgba(59, 130, 246, 0.3); padding-top: 20px;">Defina su horizonte de inversión para evaluar el mercado y deje que nuestro motor algorítmico construya la estrategia que mejor equilibre su riesgo y rentabilidad.</p>
 </div>
 """, unsafe_allow_html=True)
-
 # ==========================================
 # 4. SELECCIÓN DE HISTÓRICO DE DATOS
 # ==========================================
