@@ -294,7 +294,7 @@ if fechas_validas:
                 # Se reemplazó el Beta por el Riesgo (Volatilidad) en la visualización del Punto 2
                 with col_met1:
                     st.markdown("<div style='background-color:rgba(255, 75, 75, 0.1); padding:10px; border-radius:10px; border:1px solid #FF4B4B;'>", unsafe_allow_html=True)
-                    st.markdown(f"<h4 style='color:#FF4B4B; text-align:center;'>Perfil Óptimo (Sharpe)</h4>", unsafe_allow_html=True)
+                    st.markdown(f"<h4 style='color:#FF4B4B; text-align:center;'>Perfil Óptimo</h4>", unsafe_allow_html=True)
                     m1, m2 = st.columns(2)
                     m1.metric("Retorno Esperado", f"{resultados[0, idx_optimo]:.2%}")
                     m2.metric("Riesgo (Volatilidad)", f"{resultados[1, idx_optimo]:.2%}")
