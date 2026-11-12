@@ -7,7 +7,7 @@ import plotly.express as px
 import datetime
 
 # ==========================================
-# 1. CONFIGURACIÓN Y ESTILOS
+# 1. CONFIGURACIÓN Y ESTILOS GLOBALES
 # ==========================================
 st.set_page_config(page_title="Financitz | ITM 2026", layout="wide", initial_sidebar_state="collapsed")
 
@@ -35,6 +35,7 @@ st.markdown("""
     
     div[role="radiogroup"] > label > div:first-child { accent-color: #3B82F6 !important; }
     
+    /* Cajas de métricas */
     div[data-testid="metric-container"] {
         background-color: rgba(30, 33, 48, 0.85); backdrop-filter: blur(10px); border-left: 5px solid #3B82F6; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
@@ -44,7 +45,10 @@ st.markdown("""
         background-color: rgba(29, 78, 216, 0.15); backdrop-filter: blur(10px); border-left: 5px solid #3B82F6; padding: 25px; border-radius: 8px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
-    .hero-banner { background-color: rgba(14, 20, 31, 0.5); backdrop-filter: blur(8px); padding: 80px 40px; border-radius: 15px; text-align: center; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.1); }
+    /* Banner Hero Híbrido */
+    .hero-banner { 
+        background-color: rgba(14, 20, 31, 0.5); backdrop-filter: blur(8px); padding: 80px 40px; border-radius: 15px; text-align: center; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.1); 
+    }
     
     h1, h2, h3, h4 { color: #E2E8F0; font-family: 'Helvetica Neue', sans-serif; }
     </style>
@@ -86,6 +90,7 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
 # ==========================================
 # 4. SELECCIÓN DE HISTÓRICO DE DATOS
 # ==========================================
